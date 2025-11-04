@@ -1,6 +1,4 @@
-```markdown
 # task-planner
-
 Простой таск‑планнер на React Native (Expo).
 
 ## Быстрый старт
