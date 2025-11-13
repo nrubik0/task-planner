@@ -26,8 +26,11 @@ const getCurrentWeek = () => {
 const weekDays = getCurrentWeek();
 
 // перекрытие задач
-const checkOverlap = (task1: any, task2: any) => {
-  const getMinutes = (time: string) => {
+const checkOverlap = (
+  task1: { time: string; duration?: number },
+  task2: { time: string; duration?: number }
+) => {
+  const getMinutes = (time: string): number => {
     const match = time.match(/(\d{1,2}):(\d{2})/);
     if (!match) return 0;
     return parseInt(match[1]) * 60 + parseInt(match[2]);
@@ -42,7 +45,10 @@ const checkOverlap = (task1: any, task2: any) => {
 };
 
 // позиционирование перекрывающихся задач
-const calculateTaskPosition = (tasks: any[], currentTask: any) => {
+const calculateTaskPosition = (
+  tasks: { id: string; time: string; duration?: number }[],
+  currentTask: { id: string; time: string; duration?: number }
+) => {
   const overlapping = tasks.filter(
     (t) => t.id !== currentTask.id && checkOverlap(t, currentTask)
   );
@@ -64,7 +70,7 @@ const calculateTaskPosition = (tasks: any[], currentTask: any) => {
 
   return {
     left: leftOffset,
-    width: taskWidth - 2, 
+    width: taskWidth - 2,
     zIndex: 5 + index,
   };
 };
@@ -109,7 +115,7 @@ export default function CalendarGrid() {
                         const hour = parseInt(timeMatch[1]);
                         const minute = parseInt(timeMatch[2]);
                         const topPosition = (hour * 60 + minute) * (80 / 60);
-                        let duration = task.duration || 60; 
+                        let duration = task.duration || 60;
 
                         // высота
                         const minHeight = 40;

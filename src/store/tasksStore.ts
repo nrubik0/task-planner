@@ -1,6 +1,6 @@
-import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface Task {
   id: string;
@@ -25,28 +25,53 @@ export const useTasksStore = create<TaskState>()(
     (set) => ({
       tasks: [],
 
-      addTask: (task) =>
-        set((state) => ({
-          tasks: [task, ...state.tasks],
-        })),
+      addTask: (task) => {
+        try {
+          set((state) => ({
+            tasks: [task, ...state.tasks],
+          }));
+        } catch (error) {
+          console.error('Ошибка при добавлении задачи:', error);
+          throw error;
+        }
+      },
 
-      updateTask: (id, updatedTask) =>
-        set((state) => ({
-          tasks: state.tasks.map((t) =>
-            t.id === id ? { ...t, ...updatedTask } : t
-          ),
-        })),
+      updateTask: (id, updatedTask) => {
+        try {
+          set((state) => ({
+            tasks: state.tasks.map((t) =>
+              t.id === id ? { ...t, ...updatedTask } : t
+            ),
+          }));
+        } catch (error) {
+          console.error('Ошибка при обновлении задачи:', error);
+          throw error;
+        }
+      },
 
-      deleteTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.filter((t) => t.id !== id),
-        })),
+      deleteTask: (id) => {
+        try {
+          set((state) => ({
+            tasks: state.tasks.filter((t) => t.id !== id),
+          }));
+        } catch (error) {
+          console.error('Ошибка при удалении задачи:', error);
+          throw error;
+        }
+      },
 
-      clearTasks: () => set({ tasks: [] }),
+      clearTasks: () => {
+        try {
+          set({ tasks: [] });
+        } catch (error) {
+          console.error('Ошибка при очистке задач:', error);
+          throw error;
+        }
+      },
     }),
 
     {
-      name: 'tasks-storage', 
+      name: 'tasks-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

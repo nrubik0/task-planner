@@ -10,7 +10,7 @@ const weekdays = [
   'субботу',
 ];
 
-// форматирование даты 
+// форматирование даты
 const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -73,6 +73,13 @@ export const parseTask = (input: string): Task => {
   } else if (/вечер/i.test(input)) time = '18:00';
   else if (/утро/i.test(input)) time = '09:00';
   else if (/полдень/i.test(input)) time = '12:00';
+
+  // длительность
+  const durationMatch = input.match(/на\s*(\d+)\s*(час|минут)/i);
+  if (durationMatch) {
+    const value = parseInt(durationMatch[1]);
+    duration = durationMatch[2].includes('час') ? value * 60 : value;
+  }
 
   // приоритет
   if (input.includes('!!!') || /срочно/i.test(input)) priority = 'high';

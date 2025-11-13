@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Text, Button, StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
+import {
+  Button,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
-import { useTasksStore } from '../store/tasksStore';
-import TaskPreview from '../components/TaskPreview';
-import { parseTask } from '../utils/taskParser';
 import TaskList from '../components/TaskList';
+import TaskPreview from '../components/TaskPreview';
+import { Task, useTasksStore } from '../store/tasksStore';
 import { suggestions } from '../utils/suggestions';
-
+import { parseTask } from '../utils/taskParser';
 
 export default function QuickAddScreen() {
   const [input, setInput] = useState('');
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const [parsedTask, setParsedTask] = useState<any>(null);
+  const [parsedTask, setParsedTask] = useState<Task | null>(null);
 
   const addTask = useTasksStore((s) => s.addTask);
 
@@ -29,14 +35,25 @@ export default function QuickAddScreen() {
   };
 
   const handleParse = () => {
-    const task = parseTask(input);
-    setParsedTask(task);
+    try {
+      if (!input.trim()) {
+        return;
+      }
+      const task = parseTask(input);
+      setParsedTask(task);
+    } catch (error) {
+      console.error('Ошибка при парсинге задачи:', error);
+    }
   };
 
-  const handleSave = (task: any) => {
-    addTask(task);
-    setParsedTask(null);
-    setInput('');
+  const handleSave = (task: Task) => {
+    try {
+      addTask(task);
+      setParsedTask(null);
+      setInput('');
+    } catch (error) {
+      console.error('Ошибка при сохранении задачи:', error);
+    }
   };
 
   return (
@@ -63,7 +80,9 @@ export default function QuickAddScreen() {
 
       <Button title="Распознать" onPress={handleParse} />
 
-      {parsedTask && <TaskPreview parsedTask={parsedTask} onSave={handleSave} />}
+      {parsedTask && (
+        <TaskPreview parsedTask={parsedTask} onSave={handleSave} />
+      )}
 
       <TaskList />
     </ScrollView>
@@ -72,8 +91,18 @@ export default function QuickAddScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
-  inputContainer: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10 },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  inputContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
   suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  autocompleteContainer: { marginBottom: 10, },
+  autocompleteContainer: { marginBottom: 10 },
 });
